@@ -19,23 +19,23 @@
 ```
 LLMPromptDiffApp/
 ├── Models/
-│   └── ModifiedCode.cs          
+│   └── ModifiedCode.cs
 ├── Services/
-│   ├── DiffService.cs           # Handles diff calculation and 
+│   ├── DiffService.cs           # Handles diff calculation and
 │   └── PromptService.cs         # Generates AI prompts from diffs
 ├── Views/
 │   ├── CodeEditorView.xaml      # Main code editing interface
-│   ├── CodeEditorView.xaml.cs   
+│   ├── CodeEditorView.xaml.cs
 │   ├── PromptPreviewView.xaml   # Prompt display interface
-│   └── PromptPreviewView.xaml.cs 
+│   └── PromptPreviewView.xaml.cs
 ├── Utils/
 │   └── FileUtils.cs             # File I/O utilities
 ├── Examples/
-│   ├── DataService.cs          
-│   └── PrintService.cs         
-├── MainWindow.xaml             
-├── MainWindow.xaml.cs           
-└── App.xaml                     
+│   ├── DataService.cs
+│   └── PrintService.cs
+├── MainWindow.xaml
+├── MainWindow.xaml.cs
+└── App.xaml
 ```
 
 ## Getting Started
@@ -48,17 +48,20 @@ LLMPromptDiffApp/
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone <repository-url>
    cd LLMPromptDiffApp
    ```
 
 2. Restore NuGet packages:
+
    ```bash
    dotnet restore
    ```
 
 3. Build the application:
+
    ```bash
    dotnet build
    ```
@@ -111,18 +114,17 @@ The application looks for example files in the `Examples/` directory relative to
 
 ## Development
 
-### Adding New Features
-
 The application follows a clean architecture pattern:
 
 - **Models**: Data structures and business logic
-- **Services**: Core functionality 
+- **Services**: Core functionality
 - **Views**: UI components and user interactions
 - **Utils**: Helper functions and utilities
 
 ## Future Enhancements
 
 Potential improvements for future versions:
+
 - Support for multiple file types (not just C#)
 - Integration with popular LLM APIs
 - Syntax highlighting in code editors
