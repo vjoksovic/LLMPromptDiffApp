@@ -1,0 +1,11 @@
+# Build outputs
+bin/
+obj/
+
+# IDE files
+.idea/
+*.DotSettings.user
+
+# OS files
+Thumbs.db
+.DS_Store

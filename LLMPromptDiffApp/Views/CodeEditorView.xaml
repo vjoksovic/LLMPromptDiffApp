@@ -1,0 +1,215 @@
+<UserControl x:Class="LLMPromptDiffApp.Views.CodeEditorView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:LLMPromptDiffApp.Views"
+        mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800">
+    
+    <UserControl.Resources>
+        <!-- Dark Theme ComboBox Style -->
+        <Style x:Key="DarkComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="#3E3E42"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#5E5E5E"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton Name="ToggleButton" 
+                                        Grid.Column="2" 
+                                        Focusable="false" 
+                                        IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" 
+                                        ClickMode="Press"
+                                        Background="#3E3E42"
+                                        BorderBrush="#5E5E5E"
+                                        BorderThickness="1">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="20"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ContentPresenter Name="ContentSite" 
+                                                    IsHitTestVisible="False" 
+                                                    Content="{TemplateBinding SelectionBoxItem}" 
+                                                    ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" 
+                                                    ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" 
+                                                    Margin="8,4,23,4" 
+                                                    VerticalAlignment="Center" 
+                                                    HorizontalAlignment="Left"/>
+                                    <Path x:Name="Arrow" 
+                                        Grid.Column="1" 
+                                        Fill="White" 
+                                        HorizontalAlignment="Center" 
+                                        VerticalAlignment="Center" 
+                                        Data="M 0 0 L 4 4 L 8 0 Z"/>
+                                </Grid>
+                            </ToggleButton>
+                            <TextBox x:Name="PART_EditableTextBox" 
+                                   Style="{x:Null}" 
+                                   HorizontalAlignment="Left" 
+                                   VerticalAlignment="Center" 
+                                   Margin="8,4,23,4" 
+                                   Focusable="True" 
+                                   Background="Transparent" 
+                                   Foreground="White"
+                                   BorderThickness="0"
+                                   Visibility="Hidden" 
+                                   IsReadOnly="{TemplateBinding IsReadOnly}"/>
+                            <Popup Name="Popup" 
+                                 Placement="Bottom" 
+                                 IsOpen="{TemplateBinding IsDropDownOpen}" 
+                                 AllowsTransparency="True" 
+                                 Focusable="False" 
+                                 PopupAnimation="Slide">
+                                <Grid Name="DropDown" 
+                                    SnapsToDevicePixels="True" 
+                                    MinWidth="{TemplateBinding ActualWidth}" 
+                                    MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border x:Name="DropDownBorder" 
+                                          Background="#2D2D30" 
+                                          BorderThickness="1" 
+                                          BorderBrush="#5E5E5E">
+                                        <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDropDownOpen" Value="true">
+                                <Setter TargetName="DropDownBorder" Property="CornerRadius" Value="4"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#888"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- Dark Theme ComboBoxItem Style -->
+        <Style x:Key="DarkComboBoxItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="#2D2D30"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Margin" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#3E3E42"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#007ACC"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#2D2D30" Padding="10">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Code Editor" FontSize="16" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="10,0"/>
+                <!-- Load File Dropdown -->
+                <ComboBox x:Name="LoadFileComboBox" 
+                          Width="150"
+                          Margin="5,0"
+                          Style="{StaticResource DarkComboBoxStyle}"
+                          ItemsSource="{Binding ExampleFiles}"
+                          SelectedItem="{Binding SelectedExampleFile}"
+                          Text="Select file..."
+                          IsEditable="True"
+                          IsReadOnly="True"
+                          SelectionChanged="LoadFileComboBox_SelectionChanged"/>
+                <Button Content="Compare" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5,0" Background="#007ACC" Foreground="White" Click="CompareButton_Click"/>
+                <Button Content="Create Prompt" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5,0" Background="#28A745" Foreground="White" Click="CreatePromptButton_Click"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Original Code Panel -->
+            <Border Grid.Column="0" Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Border Grid.Row="0" Background="#2D2D30" Padding="8">
+                        <TextBlock Text="Current Code" Foreground="White" FontWeight="SemiBold"/>
+                    </Border>
+                    
+                    <TextBox Grid.Row="1" 
+                             Background="#1E1E1E" 
+                             Foreground="#D4D4D4" 
+                             FontFamily="Consolas" 
+                             FontSize="12"
+                             AcceptsReturn="True"
+                             AcceptsTab="True"
+                             TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"
+                             HorizontalScrollBarVisibility="Auto"
+                             Padding="10"
+                             Text="{Binding OriginalCode, UpdateSourceTrigger=PropertyChanged}"
+                             x:Name="OriginalCodeTextBox"/>
+                </Grid>
+            </Border>
+            
+            <!-- Splitter -->
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="#3E3E42"/>
+            
+            <!-- Diff Panel -->
+            <Border Grid.Column="2" Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Border Grid.Row="0" Background="#2D2D30" Padding="8">
+                        <TextBlock Text="Diff View" Foreground="White" FontWeight="SemiBold"/>
+                    </Border>
+                    
+                    <RichTextBox Grid.Row="1" 
+                                 Background="#1E1E1E" 
+                                 Foreground="#D4D4D4" 
+                                 FontFamily="Consolas" 
+                                 FontSize="12"
+                                 VerticalScrollBarVisibility="Auto"
+                                 HorizontalScrollBarVisibility="Auto"
+                                 Padding="10"
+                                 IsReadOnly="True"
+                                 x:Name="DiffRichTextBox"/>
+                </Grid>
+            </Border>
+        </Grid>
+        
+        <!-- Status Bar -->
+        <Border Grid.Row="2" Background="#007ACC" Padding="8">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Ready" Foreground="White" VerticalAlignment="Center"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="10,0"/>
+                <TextBlock Text="{Binding StatusMessage}" Foreground="White" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
