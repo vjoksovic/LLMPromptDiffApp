@@ -61,7 +61,11 @@ public partial class CodeEditorView : UserControl
     private void CompareButton_Click(object sender, RoutedEventArgs e)
     {
         _code.CodeDiff = _diffService.BuildFormattedDiff(_code);
-        DisplayColoredDiff();
+        if (_code.OriginalCode == _code.CurrentCode)
+            MessageBox.Show($"Edit code to see code diff!", "Information", MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        else
+            DisplayColoredDiff();
     }
 
     private void DisplayColoredDiff()
@@ -73,13 +77,22 @@ public partial class CodeEditorView : UserControl
 
     private void CreatePromptButton_Click(object sender, RoutedEventArgs e)
     {
+        Console.WriteLine(_code.CodeDiff);
+        _code.CodeDiff = _diffService.BuildFormattedDiff(_code);
+        Console.WriteLine(_code.CodeDiff);
         var codeDifference = _code.CodeDiff;
         var prompt = PromptService.MakePrompt(codeDifference);
         ShowPromptInPreview(prompt);
     }
 
-    private static void ShowPromptInPreview(string prompt)
+    private void ShowPromptInPreview(string prompt)
     {
+        if (_code.OriginalCode == _code.CurrentCode)
+        {
+            MessageBox.Show($"Edit code to be able to make a prompt!", "Information", MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            return;
+        }
         var mainWindow = Application.Current.MainWindow as MainWindow;
         if (mainWindow != null)
         {
